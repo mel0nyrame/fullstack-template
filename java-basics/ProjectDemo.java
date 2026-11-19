@@ -77,6 +77,33 @@ public class ProjectDemo {
         p3.printState();
 
 
+        Project p4 = new Project(4, "测试拒绝项目", 1000);
+        if(p4.apply(600)){
+            System.out.println("申请 600 → 成功");
+        }
+        p4.printState();
+        if(p4.reject("")){
+            System.out.println("拒绝（理由为空）→ 成功");
+        }else{
+            System.out.println("拒绝（理由为空）→ 失败");
+        }
+        if(p4.reject("预算取消")){
+            System.out.println("拒绝（理由：预算取消）→ 成功");
+        }
+        p4.printState();
+
+
+        Project p5 = new Project(5, "测试取消项目", 1000);
+        p5.apply(600);
+        p5.approve(500);
+        System.out.println("申请 600 → 批准 500");
+
+        p5.printState();
+        if(p5.cancel("不需要了")){
+            System.out.println("取消（理由：不需要了）→ 成功");
+        }
+        p5.printState();
+
     }
 
 }

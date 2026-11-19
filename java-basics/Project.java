@@ -64,4 +64,29 @@ public class Project {
         state = State.SETTLED;
         return true;
     }
+
+    boolean reject(String reason) {
+        if(state != State.PENDING_L1){
+            return false;
+        }
+        if(reason == null || reason.isBlank()){
+            return false;
+        }
+        frozen = 0;
+        state = State.REJECTED;
+        return true;
+    }
+
+    boolean cancel(String reason) {
+        if (reason == null || reason.isEmpty()) {
+            return false;
+        }
+        if (state != State.PENDING_L1 && state != State.APPROVED) {
+            return false;
+        }
+        frozen = 0;
+        state = State.CANCELED;
+        return true;
+    }
+
 }
