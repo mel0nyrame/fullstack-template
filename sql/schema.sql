@@ -7,36 +7,36 @@ CREATE DATABASE IF NOT EXISTS campus_erp
 
 USE campus_erp;
 
--- 按外键依赖顺序删除，避免报错
+-- 按外键依赖顺序删除：先删子表，再删父表
 DROP TABLE IF EXISTS application;
 DROP TABLE IF EXISTS project_member;
 DROP TABLE IF EXISTS project;
 DROP TABLE IF EXISTS member;
 
 CREATE TABLE member (
-    id   INT PRIMARY KEY AUTO_INCREMENT,
+    id   BIGINT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(50) NOT NULL,
     role VARCHAR(20) NOT NULL
 );
 
 CREATE TABLE project (
-    id           INT PRIMARY KEY AUTO_INCREMENT,
+    id           BIGINT PRIMARY KEY AUTO_INCREMENT,
     name         VARCHAR(100) NOT NULL,
     total_amount DECIMAL(10,2) NOT NULL
 );
 
 CREATE TABLE project_member (
-    project_id INT NOT NULL,
-    member_id  INT NOT NULL,
+    project_id BIGINT NOT NULL,
+    member_id  BIGINT NOT NULL,
     PRIMARY KEY (project_id, member_id),
     FOREIGN KEY (project_id) REFERENCES project(id),
     FOREIGN KEY (member_id)  REFERENCES member(id)
 );
 
 CREATE TABLE application (
-    id              INT PRIMARY KEY AUTO_INCREMENT,
-    project_id      INT NOT NULL,
-    applicant_id    INT NOT NULL,
+    id              BIGINT PRIMARY KEY AUTO_INCREMENT,
+    project_id      BIGINT NOT NULL,
+    applicant_id    BIGINT NOT NULL,
     purpose         VARCHAR(200) NOT NULL,
     apply_amount    DECIMAL(10,2) NOT NULL,
     approved_amount DECIMAL(10,2) NULL,
