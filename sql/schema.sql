@@ -42,6 +42,7 @@ CREATE TABLE application (
     approved_amount DECIMAL(10,2) NULL,
     actual_amount   DECIMAL(10,2) NULL,
     state           VARCHAR(20) NOT NULL,
+    reason          VARCHAR(200) NULL,
     created_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (project_id)   REFERENCES project(id),
     FOREIGN KEY (applicant_id) REFERENCES member(id)
