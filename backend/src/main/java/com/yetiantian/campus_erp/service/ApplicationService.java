@@ -61,7 +61,80 @@ public class ApplicationService {
         application.setCreatedAt(LocalDateTime.now());
         // 5. 保存并返回
         return applicationRepository.save(application);
+    }
 
+    private Application findApplication(Long id) {
+        return applicationRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("申请不存在"));
+    }
+
+    // 1. 审批通过
+    @Transactional
+    public void approve(Long id, BigDecimal amount) {
+        Application app = findApplication(id);
+
+        if (app.getState() != State.PENDING_L1) {
+            throw new RuntimeException("当前状态不允许审批");
+        }
+        if (amount.compareTo(BigDecimal.ZERO) <= 0 || amount.compareTo(app.getApplyAmount()) > 0) {
+            throw new RuntimeException("批准金额必须大于0且不能超过申请金额");
+        }
+
+        app.setApprovedAmount(amount);
+        app.setState(State.APPROVED);
+        applicationRepository.save(app);
+    }
+
+    // 2. 结算
+    @Transactional
+    public void settle(Long id, BigDecimal actual) {
+        Application app = findApplication(id);
+
+        if (app.getState() != State.APPROVED) {
+            throw new RuntimeException("没审批通过不能结算");
+        }
+        // 注意这里是 < 0，允许结算为 0 元
+        if (actual.compareTo(BigDecimal.ZERO) < 0 || actual.compareTo(app.getApprovedAmount()) > 0) {
+            throw new RuntimeException("结算金额不合法");
+        }
+
+        app.setActualAmount(actual);
+        app.setState(State.SETTLED);
+        applicationRepository.save(app);
+    }
+
+    // 3. 驳回
+    @Transactional
+    public void reject(Long id, String reason) {
+        Application app = findApplication(id);
+
+        if (app.getState() != State.PENDING_L1) {
+            throw new RuntimeException("当前状态不允许驳回");
+        }
+        if (reason == null || reason.trim().isEmpty()) {
+            throw new RuntimeException("驳回原因不能为空");
+        }
+
+        app.setReason(reason); // 之前加的那个字段派上用场了
+        app.setState(State.REJECTED); // 状态一变，冻结的钱自动解冻
+        applicationRepository.save(app);
+    }
+
+    // 4. 取消
+    @Transactional
+    public void cancel(Long id, String reason) {
+        Application app = findApplication(id);
+
+        if (app.getState() != State.PENDING_L1 && app.getState() != State.APPROVED) {
+            throw new RuntimeException("当前状态不允许取消");
+        }
+        if (reason == null || reason.trim().isEmpty()) {
+            throw new RuntimeException("取消原因不能为空");
+        }
+
+        app.setReason(reason);
+        app.setState(State.CANCELED);
+        applicationRepository.save(app);
     }
 
     public BigDecimal sumFrozen(Long projectId) {
