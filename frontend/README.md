@@ -1,6 +1,6 @@
 # 前端工程
 
-你在浏览器里看到的页面，以及点击、输入后的反应，都属于前端的工作。这里用来放前端工程，当前还没有初始化。项目流程和 Git 规范先读[根 README](../README.md)。
+你在浏览器里看到的页面，以及点击、输入后的反应，都属于前端的工作。这里用来放前端工程，已使用 Vue 3 + Vite 初始化。项目流程和 Git 规范先读[根 README](../README.md)。
 
 ## 先选一套能够解释的方案
 
@@ -43,3 +43,16 @@ JavaScript 和 TypeScript 都可以。TypeScript 额外提供类型检查能力�
 - [Vue 入门与工程创建](https://cn.vuejs.org/guide/quick-start.html)
 - [Vue 的 TypeScript 说明](https://cn.vuejs.org/guide/typescript/overview.html)
 - [Vite 官方说明](https://vite.dev/guide/)
+
+## 实际技术栈
+
+- Vue 3.5（`<script setup>` 单文件组件）
+- Vite 8.3
+- JavaScript（未使用 TypeScript）
+
+## 常用命令
+
+```bash
+npm install # 安装依赖
+npm run dev # 开发启动，默认 http://localhost:5173
+npm run build # 构建产物到 dist/
