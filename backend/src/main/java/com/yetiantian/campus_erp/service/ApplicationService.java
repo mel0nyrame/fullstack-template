@@ -26,10 +26,10 @@ public class ApplicationService {
 
     @Transactional
     public Application submit(Long projectId, Long applicantId, String purpose, BigDecimal amount) {
-        // 1. 查项目和申请人（不存在就抛异常）
+
         Project project = projectRepository.findById(projectId).orElseThrow(() -> new RuntimeException("项目不存在"));
         Member applicant = memberRepository.findById(applicantId).orElseThrow(() -> new RuntimeException("申请人不存在"));
-        // 2. 校验 purpose 非空、amount > 0
+
         if (purpose == null || purpose.trim().isEmpty()) {
             throw new RuntimeException("用途不能为空");
         }
@@ -39,7 +39,7 @@ public class ApplicationService {
         if (amount.scale() > 2) {
             throw new RuntimeException("金额最多两位小数");
         }
-        // 3. 算出冻结总额，检查钱够不够
+
         BigDecimal frozenAmount = sumFrozen(projectId);
         BigDecimal usedAmount = sumUsed(projectId);
 
@@ -51,7 +51,6 @@ public class ApplicationService {
             throw new RuntimeException("经费不足");
         }
 
-        // 4. 创建 Application，设状态为 PENDING_L1
         Application application = new Application();
         application.setProject(project);
         application.setApplicant(applicant);
@@ -59,7 +58,7 @@ public class ApplicationService {
         application.setApplyAmount(amount);
         application.setState(State.PENDING_L1);
         application.setCreatedAt(LocalDateTime.now());
-        // 5. 保存并返回
+
         return applicationRepository.save(application);
     }
 
@@ -68,7 +67,6 @@ public class ApplicationService {
                 .orElseThrow(() -> new RuntimeException("申请不存在"));
     }
 
-    // 1. 审批通过
     @Transactional
     public void approve(Long id, BigDecimal amount) {
         Application app = findApplication(id);
@@ -85,7 +83,6 @@ public class ApplicationService {
         applicationRepository.save(app);
     }
 
-    // 2. 结算
     @Transactional
     public void settle(Long id, BigDecimal actual) {
         Application app = findApplication(id);
@@ -93,7 +90,7 @@ public class ApplicationService {
         if (app.getState() != State.APPROVED) {
             throw new RuntimeException("没审批通过不能结算");
         }
-        // 注意这里是 < 0，允许结算为 0 元
+
         if (actual.compareTo(BigDecimal.ZERO) < 0 || actual.compareTo(app.getApprovedAmount()) > 0) {
             throw new RuntimeException("结算金额不合法");
         }
@@ -103,7 +100,6 @@ public class ApplicationService {
         applicationRepository.save(app);
     }
 
-    // 3. 驳回
     @Transactional
     public void reject(Long id, String reason) {
         Application app = findApplication(id);
@@ -115,8 +111,8 @@ public class ApplicationService {
             throw new RuntimeException("驳回原因不能为空");
         }
 
-        app.setReason(reason); // 之前加的那个字段派上用场了
-        app.setState(State.REJECTED); // 状态一变，冻结的钱自动解冻
+        app.setReason(reason);
+        app.setState(State.REJECTED);
         applicationRepository.save(app);
     }
 
@@ -135,6 +131,10 @@ public class ApplicationService {
         app.setReason(reason);
         app.setState(State.CANCELED);
         applicationRepository.save(app);
+    }
+
+    public Application get(Long id) {
+        return findApplication(id);
     }
 
     public BigDecimal sumFrozen(Long projectId) {
