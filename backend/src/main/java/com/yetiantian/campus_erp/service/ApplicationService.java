@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class ApplicationService {
@@ -135,6 +136,10 @@ public class ApplicationService {
 
     public Application get(Long id) {
         return findApplication(id);
+    }
+
+    public List<Application> listByProject(Long projectId) {
+        return applicationRepository.findByProjectId(projectId);
     }
 
     public BigDecimal sumFrozen(Long projectId) {

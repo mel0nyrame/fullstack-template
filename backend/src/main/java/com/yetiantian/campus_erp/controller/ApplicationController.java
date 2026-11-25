@@ -5,6 +5,7 @@ import com.yetiantian.campus_erp.service.ApplicationService;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/applications")
@@ -53,5 +54,10 @@ public class ApplicationController {
     @GetMapping("/{id}")
     public Application get(@PathVariable Long id) {
         return service.get(id);
+    }
+
+    @GetMapping
+    public List<Application> list(@RequestParam Long projectId) {
+        return service.listByProject(projectId);
     }
 }
